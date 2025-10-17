@@ -1,0 +1,56 @@
+name: Release Management
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Run tests
+      run: |
+        python main.py
+        
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          ## Excel数据处理工具 ${{ github.ref }}
+          
+          ### 功能特性
+          - ✅ 数据拍平：将Excel数据转换为扁平化CSV结构
+          - ✅ JSON转换：生成8层嵌套JSON结构
+          - ✅ 数据统计：自动生成数据摘要报告
+          
+          ### 使用方法
+          ```bash
+          cd code
+          python main.py
+          ```
+          
+          ### 输出文件
+          - `flattened_data.csv` - 扁平化数据
+          - `excel_to_json.json` - JSON结构数据
+          - `excel_data_summary.md` - 数据摘要报告
+        draft: false
+        prerelease: false

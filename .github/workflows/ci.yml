@@ -1,0 +1,36 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        
+    - name: Run Excel data processing
+      run: |
+        cd code
+        python main.py
+        
+    - name: Check output files
+      run: |
+        ls -la code/output/
+        test -f code/output/flattened_data.csv
+        test -f code/output/excel_to_json.json
+        test -f code/output/excel_data_summary.md
